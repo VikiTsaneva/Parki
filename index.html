@@ -2809,6 +2809,55 @@
         body.offline .lang-en::after {
             content: "📴 Offline mode";
         }
+
+        /* Inline style replacements */
+        .hidden {
+            display: none;
+        }
+
+        .favorites-login-prompt {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .large-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .admin-badge {
+            background: var(--admin-badge);
+            color: var(--admin-text);
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-top: 5px;
+        }
+
+        .logout-btn {
+            background: var(--accent);
+            margin-top: 10px;
+        }
+
+        .admin-title {
+            margin-bottom: 20px;
+        }
+
+        .center-text {
+            text-align: center;
+        }
+
+        .error-msg {
+            color: var(--accent);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .success-msg {
+            color: var(--success);
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body data-lang="bg">
@@ -2837,7 +2886,7 @@
                     <span class="lang-bg">Профил</span>
                     <span class="lang-en">Profile</span>
                 </div>
-                <div class="nav-item" id="admin-nav-item" data-page="admin" style="display: none;">
+                <div class="nav-item hidden" id="admin-nav-item" data-page="admin">
                     <i class="fas fa-users-cog"></i>
                     <span class="lang-bg">Админ</span>
                     <span class="lang-en">Admin</span>
@@ -2852,7 +2901,7 @@
                     <span class="lang-bg">Регистрация</span>
                     <span class="lang-en">Register</span>
                 </div>
-                <div class="nav-item" id="logout-nav-item" data-page="logout" style="display: none;">
+                <div class="nav-item hidden" id="logout-nav-item" data-page="logout">
                     <i class="fas fa-sign-out-alt"></i>
                     <span class="lang-bg">Изход</span>
                     <span class="lang-en">Logout</span>
@@ -3033,8 +3082,8 @@
                     <h2 class="form-title lang-en"> Favorite Parking Lots</h2>
                     
                     <!-- Login prompt за любими -->
-                    <div id="favorites-login-prompt" style="display: none; text-align: center; padding: 50px 20px;">
-                        <i class="fas fa-lock" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 20px;"></i>
+                    <div id="favorites-login-prompt" class="hidden favorites-login-prompt">
+                        <i class="fas fa-lock large-icon"></i>
                         <p class="lang-bg">Моля, <a href="#" onclick="document.querySelector('[data-page=login]').click(); return false;">влезте</a> в профила си, за да видите любимите места.</p>
                         <p class="lang-en">Please <a href="#" onclick="document.querySelector('[data-page=login]').click(); return false;">login</a> to see your favorite spots.</p>
                     </div>
@@ -3056,7 +3105,7 @@
                                 <h2 id="profile-name-en" class="lang-en"></h2>
                                 <p><i class="fas fa-envelope"></i> <span id="profile-email"></span></p>
                                 <p><i class="fas fa-phone"></i> <span id="profile-phone">-</span></p>
-                                <p id="profile-admin-badge" style="display: none; background: var(--admin-badge); color: var(--admin-text); padding: 5px 10px; border-radius: 20px; margin-top: 5px;">
+                                <p id="profile-admin-badge" class="hidden admin-badge">
                                     <i class="fas fa-crown"></i> <span class="lang-bg">Администратор</span><span class="lang-en">Administrator</span>
                                 </p>
                             </div>
@@ -3102,7 +3151,7 @@
                                 <span class="lang-en">Edit</span>
                             </button>
                             
-                            <button class="edit-profile-btn" id="logoutProfileBtn" style="background: var(--accent); margin-top: 10px;">
+                            <button class="edit-profile-btn logout-btn" id="logoutProfileBtn">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span class="lang-bg">Изход</span>
                                 <span class="lang-en">Logout</span>
@@ -3157,8 +3206,8 @@
                 <!-- Админ панел -->
                 <div id="admin-page" class="page">
                     <div class="admin-container">
-                        <h2 class="lang-bg" style="margin-bottom: 20px;"> Администраторско табло</h2>
-                        <h2 class="lang-en" style="margin-bottom: 20px;"> Admin Dashboard</h2>
+                        <h2 class="lang-bg admin-title"> Администраторско табло</h2>
+                        <h2 class="lang-en admin-title"> Admin Dashboard</h2>
                         
                         <div class="admin-stats">
                             <div class="admin-stat-card">
@@ -3219,7 +3268,7 @@
                                 </thead>
                                 <tbody id="adminUsersTableBody">
                                     <tr>
-                                        <td colspan="9" style="text-align: center;">Зареждане...</td>
+                                        <td colspan="9" class="center-text">Зареждане...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -3280,8 +3329,8 @@
                                     <a href="#" onclick="document.querySelector('[data-page=register]').click(); return false;" class="lang-en">Register</a>
                                 </div>
                                 
-                                <div id="login-error" style="color: var(--accent); text-align: center; margin-top: 10px; display: none;"></div>
-                                <div id="login-success" style="color: var(--success); text-align: center; margin-top: 10px; display: none;"></div>
+                                <div id="login-error" class="error-msg hidden"></div>
+                                <div id="login-success" class="success-msg hidden"></div>
                             </form>
                         </div>
                     </div>
@@ -3366,8 +3415,8 @@
                                     <a href="#" onclick="document.querySelector('[data-page=login]').click(); return false;" class="lang-en">Login</a>
                                 </div>
                                 
-                                <div id="register-error" style="color: var(--accent); text-align: center; margin-top: 10px; display: none;"></div>
-                                <div id="register-success" style="color: var(--success); text-align: center; margin-top: 10px; display: none;"></div>
+                                <div id="register-error" class="error-msg hidden"></div>
+                                <div id="register-success" class="success-msg hidden"></div>
                             </form>
                         </div>
                     </div>
@@ -3388,7 +3437,7 @@
                     </div>
                     
                     <!-- iOS инструкции (показват се само на iOS) -->
-                    <div class="ios-instructions" id="iosInstructions" style="display: none;">
+                    <div class="ios-instructions hidden" id="iosInstructions">
                         <h4><i class="fab fa-apple"></i> <span class="lang-bg">За iOS устройства</span><span class="lang-en">For iOS devices</span></h4>
                         <p><i class="fas fa-1"></i> <span class="lang-bg">Натиснете бутона "Сподели" <i class="fas fa-share-square"></i> в браузъра</span><span class="lang-en">Tap the Share button <i class="fas fa-share-square"></i> in Safari</span></p>
                         <p><i class="fas fa-2"></i> <span class="lang-bg">Превъртете надолу и изберете "Добави на началния екран"</span><span class="lang-en">Scroll down and select "Add to Home Screen"</span></p>
