@@ -118,7 +118,36 @@ window.promptInstall = function() {
             installBanner.style.display = 'none';
         });
     } else {
-        showNotification('Инсталацията не е възможна в момента. Опитайте отново по-късно.', 'error');
+        // Няма beforeinstallprompt (още). Най-честите причини са:
+        // - страницата не е в secure context (HTTPS/localhost)
+        // - service worker току-що е инсталиран и още не контролира страницата (нужен е reload)
+        const isSecure = window.isSecureContext === true;
+        const hasSW = ('serviceWorker' in navigator);
+        const hasController = hasSW && !!navigator.serviceWorker.controller;
+
+        if (!isSecure) {
+            showNotification(
+                'Инсталацията не е възможна',
+                'За PWA инсталация отворете приложението през HTTPS или http://localhost (не от file://).',
+                '⚠️'
+            );
+            return;
+        }
+
+        if (hasSW && !hasController) {
+            showNotification(
+                'Още една стъпка',
+                'Приложението току-що активира Service Worker. Моля, презаредете страницата и опитайте пак.',
+                '🔄'
+            );
+            return;
+        }
+
+        showNotification(
+            'Инсталацията не е налична в момента',
+            'Ако използвате Chrome/Edge, проверете менюто на браузъра за "Install app" / "Инсталирай приложение".',
+            'ℹ️'
+        );
     }
 };
 
@@ -1583,6 +1612,21 @@ document.addEventListener('DOMContentLoaded', function() {
         navigator.serviceWorker.register('/service-worker.js')
             .then((reg) => {
                 console.log('Service Worker регистриран:', reg.scope);
+
+                // Ако SW още не контролира страницата, при първо активиране ще има controllerchange.
+                // Еднократен auto-reload прави приложението "controlled", което често отключва beforeinstallprompt.
+                if (!navigator.serviceWorker.controller) {
+                    const onControllerChange = () => {
+                        navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+                        // Предпазваме от infinite reload
+                        if (!sessionStorage.getItem('swControllerReloaded')) {
+                            sessionStorage.setItem('swControllerReloaded', 'true');
+                            window.location.reload();
+                        }
+                    };
+                    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+                }
+
                 // След като SW е наличен, шансът beforeinstallprompt да се появи е по-голям
                 updateInstallButton();
             })
