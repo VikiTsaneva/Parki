@@ -2,7 +2,7 @@
   "name": "Parkly",
   "short_name": "Parkly",
   "description": "Откривайте свободни паркоместа в реално време",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2c3e50",

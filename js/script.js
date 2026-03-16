@@ -1610,7 +1610,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Ползваме относителен път, за да работи и когато приложението е хостнато в подпапка
-        navigator.serviceWorker.register('service-worker.js')
+        navigator.serviceWorker.register('./service-worker.js')
             .then((reg) => {
                 console.log('Service Worker регистриран:', reg.scope);
 
