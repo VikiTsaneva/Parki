@@ -534,6 +534,24 @@ function clearProfilePage() {
 
 async function loadUserProfile(userId) {
     try {
+        // Синхронизиране на статуса на потвърждението на имейла
+        if (currentUser) {
+            const userDoc = await db.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const dbEmailVerified = userDoc.data().emailVerified || false;
+                const authEmailVerified = currentUser.emailVerified;
+                
+                // Ако има несъответствие между Auth и Firestore
+                if (dbEmailVerified !== authEmailVerified) {
+                    await db.collection('users').doc(userId).update({
+                        emailVerified: authEmailVerified
+                    });
+                    // Малка пауза след актуализацията
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+            }
+        }
+        
         const userDoc = await db.collection('users').doc(userId).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
@@ -975,6 +993,26 @@ function setupFirebaseListeners() {
     });
     
     console.log("Firebase слушатели са активирани (включително за място 3)");
+    
+    // Слушател за актуални промени във Firestore потребители
+    // Този слушател гарантира, че админ-панелът показва най-новите данни винаги
+    db.collection('users').onSnapshot((snapshot) => {
+        if (!isAdmin || !document.getElementById('adminUsersTableBody')) {
+            return; // Не обновяваме, ако не е админ или админ панелът не е открит
+        }
+        
+        // Зареждаме всички потребители отново
+        allUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        filteredUsers = [...allUsers];
+        
+        console.log(`Real-time update: Зареждени ${allUsers.length} потребители`);
+        
+        // Актуализираме админ статистиката и таблицата
+        updateAdminStats();
+        displayAdminUsers();
+    }, (error) => {
+        console.error('Error listening to users collection:', error);
+    });
 }
 
 function updateSpotStatus(spotNumber, status, distance) {
@@ -1691,8 +1729,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     setTimeout(manualRefresh, 1500);
     
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
         console.log("Auth state променен:", user ? user.email : "няма потребител");
+        
+        // Синхронизиране на статуса на потвърждението на имейла между Auth и Firestore
+        if (user) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const dbEmailVerified = userDoc.data().emailVerified || false;
+                    const authEmailVerified = user.emailVerified;
+                    
+                    // Ако има несъответствие между Auth и Firestore, актуализиране на Firestore
+                    if (dbEmailVerified !== authEmailVerified) {
+                        await db.collection('users').doc(user.uid).update({
+                            emailVerified: authEmailVerified
+                        });
+                        console.log(`Email verification status synced: ${authEmailVerified}`);
+                        
+                        // Ако е админ, обнови таблицата със потребители
+                        if (isAdmin && allUsers.length > 0) {
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            loadAllUsers();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error syncing email verification status:', error);
+            }
+        }
+        
         updateUIBasedOnAuth(user);
         
         if (map && parkingPolygons.length > 0) {
@@ -1785,6 +1851,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.log('Навигация на админ панел, зареждаме потребители...');
                         console.log('isAdmin:', isAdmin);
                         console.log('currentUser:', currentUser ? currentUser.uid : 'няма');
+                        // Натиснете отново да се заредят свежи данни
+                        allUsers = [];
+                        filteredUsers = [];
+                        currentAdminPage = 1;
                         loadAllUsers();
                     }
                     
