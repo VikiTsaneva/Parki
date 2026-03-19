@@ -478,10 +478,40 @@ body {
 
 /* Статус панел */
 .status-panel.restricted {
-    filter: blur(4px);
-    opacity: var(--restricted-opacity);
-    pointer-events: none;
-    user-select: none;
+    opacity: 1;
+    pointer-events: auto;
+    user-select: auto;
+}
+
+.status-panel.restricted .login-prompt {
+    opacity: 1;
+    pointer-events: auto;
+    padding: 24px 20px;
+    font-size: 1.05rem;
+}
+
+.status-panel.restricted .login-prompt-header {
+    margin-bottom: 12px;
+}
+
+.status-panel.restricted .login-prompt-icon {
+    font-size: 32px;
+}
+
+.status-panel.restricted .login-prompt-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.status-panel.restricted .login-prompt-description {
+    font-size: 0.95rem;
+    margin: 8px 0;
+}
+
+.status-panel.restricted .status-title,
+.status-panel.restricted .status-item,
+.status-panel.restricted .last-update {
+    display: none !important;
 }
 
 .status-panel {
