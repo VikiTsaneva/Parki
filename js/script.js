@@ -453,6 +453,10 @@ function updateUIBasedOnAuth(user) {
         
         loadUserFavorites().then(() => {
             updateFavoriteButtons();
+            // Преиграваме паркоместата за да обновим попапите със новата информация за любимите места
+            if (map && parkingPolygons.length > 0) {
+                createParkingSpots();
+            }
         });
         
         loadUserProfile(user.uid);
@@ -841,7 +845,7 @@ window.viewUserDetails = function(userId) {
         </div>
         <div class="user-detail-item">
             <div class="user-detail-label">${lang === 'bg' ? 'Провайдър' : 'Provider'}</div>
-            <div class="user-detail-value"><i class="fab fa-${user.provider === 'google' ? 'google' : 'envelope'}"></i> ${user.provider === 'google' ? 'Google' : (lang === 'bg' ? 'Имейл/Парола' : 'Email/Password')}</div>
+            <div class="user-detail-value"><i class="fa${user.provider === 'google' ? 'b' : 's'} fa-${user.provider === 'google' ? 'google' : 'envelope'}"></i> ${user.provider === 'google' ? 'Google' : (lang === 'bg' ? 'Имейл/Парола' : 'Email/Password')}</div>
         </div>
         <div class="user-detail-item">
             <div class="user-detail-label">${lang === 'bg' ? 'Имейл потвърден' : 'Email verified'}</div>
@@ -1171,6 +1175,16 @@ function createParkingSpots() {
     }
     
     console.log("Създаване на паркоместа...");
+    
+    // Премахваме старите полигони от картата
+    if (parkingPolygons && parkingPolygons.length > 0) {
+        parkingPolygons.forEach(polygon => map.removeLayer(polygon));
+    }
+    
+    // Премахваме старите маркери от картата
+    if (parkingMarkers && parkingMarkers.length > 0) {
+        parkingMarkers.forEach(m => map.removeLayer(m.marker));
+    }
     
     parkingPolygons = [];
     parkingMarkers = []; // Очищаваме маркерите
